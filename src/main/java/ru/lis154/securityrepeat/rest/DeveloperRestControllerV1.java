@@ -1,11 +1,10 @@
 package ru.lis154.securityrepeat.rest;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.lis154.securityrepeat.model.Developer;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,7 +25,22 @@ public class DeveloperRestControllerV1 {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('developers:read')")
     public Developer getById(@PathVariable Long id){
         return developers.stream().filter(developer -> developer.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAnyAuthority('developers:write')")
+    public Developer create (@RequestBody Developer developer){
+        System.out.println(developer);
+        this.developers.add(developer);
+        return developer;
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('developers:write')")
+    public void deleteById(@PathVariable Long id){
+        this.developers.removeIf(developer -> developer.getId().equals(id));
     }
 }
